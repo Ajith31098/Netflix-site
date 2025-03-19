@@ -1,0 +1,113 @@
+
+
+/* .register {
+    background-image: url("C:\Users\ajith\Downloads\background.jpg");
+    filter: brightness(30%); 
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: black;
+} */
+
+.register {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /* background-image: url("C:/Users/ajith/Downloads/background.jpg"); Correct path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dark overlay to reduce brightness */
+.register::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Adjust darkness (0.5 = 50% dark) */
+}
+
+/* Ensure text and content stay above the overlay */
+.register * {
+    /* position: relative; */
+    z-index: 2;
+}
+
+
+.input {
+    max-width: 600px;
+    padding: 20px;
+}
+
+/* Styling for h1 */
+.input h1 {
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+/* Styling for h6 */
+.input h6 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+/* Styling for paragraph */
+.input p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Email form: Input & Button in a single line */
+.email_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Space between input and button */
+    width: 100%;
+    max-width: 600px; /* Limits form width */
+    margin: auto; /* Centers the form */
+}
+
+/* Email input */
+.input_field {
+    width: 70%; /* Adjust width as needed */
+    max-width: 400px; /* Ensures it doesn't stretch too much */
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+}
+
+/* Get Started button */
+.get_started_btn {
+    background-color: #e50914;
+    /* width: fit-content; */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevents text from breaking */
+}
+
+.get_started_btn:hover {
+    background-color: #b20710;
+}
