@@ -1,110 +1,91 @@
-import React,{useEffect,useState} from 'react'
-import './RowPost.css'
-import Youtube from 'react-youtube'
-import {imageUrl,API_KEY} from '../../constants/constant'
-import axios from '../../axios'
-
+import React, { useEffect, useState } from 'react';
+import './RowPost.css';
+import Youtube from 'react-youtube';
+import { imageUrl, API_KEY } from '../../constants/constant';
+import axios from '../../axios';
 
 function RowPost(props) {
-    const [movies, setMovies] = useState([])
-    const [urlId,setUrlId] = useState('')
+    const [movies, setMovies] = useState([]);
+    const [urlId, setUrlId] = useState('');
+
     useEffect(() => {
-        axios.get(props.url).then(response =>{
-            console.log(response.data)
-            setMovies(response.data.results)
-        })
-    },[props.url])
+        const fetchMovies = async () => {
+            try {
+                const response = await axios.get(props.url);
+                if (response.data && response.data.results) {
+                    // Filter out movies that don't have a valid backdrop_path
+                    const filteredMovies = response.data.results.filter(movie => movie.backdrop_path);
+                    setMovies(filteredMovies);
+                } else {
+                    console.error("Unexpected API response structure:", response.data);
+                }
+            } catch (error) {
+                console.error("Error fetching movies:", error);
+            }
+        };
+
+        if (props.url) {
+            fetchMovies();
+        } else {
+            console.warn("⚠️ Warning: props.url is undefined or empty.");
+        }
+    }, [props.url]);
+
     const opts = {
         height: '300',
         width: '100%',
         playerVars: {
-          // https://developers.google.com/youtube/player_parameters
-          autoplay: 1,
+            autoplay: 1,
         },
-    };    
+    };
 
-    // const singleMovie = (id)=>{
-    //     console.log(id)
-    //     axios.get(`movie/${id}/videos?api_key=${API_KEY}`).then(response =>{
-    //         if (response.data.results.length!==0){
-    //                 setUrlId(response.data.results[0])
-    //         }else{
-    //             console.log('Trailer not Allowed')
-    //         }
-    //         console.log(response.data)
-    //         // setUrlId(response.data.results)
-    //     })
-    // }
-
-    const singleMovie = (id) => {
-        console.log(id);
-        
-        // Check if the movie ID is valid (e.g., not null or undefined)
+    const singleMovie = async (id) => {
         if (!id) {
-            console.error("Invalid movie ID");
+            console.warn("⚠️ Skipping invalid movie ID:", id);
             return;
         }
-    
-        axios
-            .get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`)
-            .then((response) => {
-                // Check if there are any video results in the response
-                if (response.data.results && response.data.results.length !== 0) {
-                    // Set the video (trailer) URL in state
-                    setUrlId(response.data.results[0]);
-                } else {
-                    // No trailer available
-                    console.log('Trailer not available for this movie');
-                    setUrlId(null); // Optionally set to null if you want to reset the URL ID
-                }
-            })
-            .catch((error) => {
-                // Catch any errors from the axios request
-                console.error("Error fetching trailer:", error.message);
-                // Optionally, you can set some state to display an error message to the user
-                setUrlId(null); // Optionally reset URL ID in case of error
-            });
+
+        try {
+            const response = await axios.get(`/movie/${id}/videos?api_key=${API_KEY}`);
+
+            if (response.data.results && response.data.results.length > 0) {
+                setUrlId(response.data.results[0].key);
+            } else {
+                console.warn(`⚠️ No trailer available for movie ID: ${id}`);
+                setUrlId(null);
+            }
+        } catch (error) {
+            console.error(`❌ Error fetching trailer for movie ID ${id}:`, error);
+            setUrlId(null);
+        }
     };
-    
 
+    return (
+        <div className='row'>
+            <h2>{props.title}</h2>
+            <div className="posters">
+                {movies.map((obj) => {
+                    const posterUrl = `${imageUrl}${obj.backdrop_path}`;
 
-    // const singleMovie = (id) => {
-    //     console.log('Movie ID:', id); // Log the movie ID for debugging
-    //     if (!id) {
-    //         console.error('Invalid movie ID');
-    //         return;
-    //     }
-    
-    //     axios.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`)
-    //         .then((response) => {
-    //             console.log('Video response:', response.data);
-    //             if (response.data.results.length !== 0) {
-    //                 setUrlId(response.data.results[0]);
-    //             } else {
-    //                 console.log('Trailer not available');
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching video:', error);
-    //         });
-    // };
-    
+                    return (
+                        <img 
+                            onClick={() => singleMovie(obj.id)} 
+                            key={obj.id} 
+                            className={props.isSmall ? 'smallPoster' : "poster"} 
+                            src={posterUrl} 
+                            alt={obj.title || "Movie Poster"} 
+                            onError={(e) => {
+                                console.warn(`⚠️ Skipping broken image for movie ID: ${obj.id}`);
+                                e.target.style.display = 'none'; // Hide the image if it fails to load
+                            }}
+                        />
+                    );
+                })}
+            </div>
 
-    
-
-  return (
-    <div className='row'>
-      <h2>{props.title}</h2>
-        <div className="posters">
-            {movies.map((obj) =>
-                <img onClick={()=>singleMovie(obj.id)} key={obj.id} className={props.isSmall ? 'smallPoster':"poster"} src={`${imageUrl+obj.backdrop_path}`} alt="poster" />
-            )}
-            
+            {urlId && <Youtube opts={opts} videoId={urlId} />}
         </div>
-
-        {  urlId && <Youtube opts={opts} videoId={urlId.key} />}
-    </div>
-  )
+    );
 }
 
-export default RowPost
+export default RowPost;

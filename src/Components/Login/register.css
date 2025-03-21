@@ -17,8 +17,8 @@
     position: relative;
     width: 100%;
     height: 100vh;
-    /* background-image: url("C:/Users/ajith/Downloads/background.jpg"); Correct path */
     background-size: cover;
+    background-image: var(--bgImage);
     background-position: center;
     background-repeat: no-repeat;
     text-align: center;

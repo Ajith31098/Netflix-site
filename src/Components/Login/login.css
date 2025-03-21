@@ -2,7 +2,7 @@
     background-size: cover;
     height:750px;
     color: white;
-    /* background-image: url("C:\Users\ajith\Downloads\a.jpg"); */
+    background-image: var(--bgImage);
 }
 
 .htwo{
